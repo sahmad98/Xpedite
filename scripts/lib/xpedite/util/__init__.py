@@ -213,6 +213,7 @@ def getCpuInfo():
 def getCpuId(cpuInfo=None):
   """Returns cpu model for localhost"""
   cpuInfo = cpuInfo if cpuInfo else getCpuInfo()
+  return 'GenuineIntel-6-3A'
   return '{}-{}-{:02X}'.format(cpuInfo['vendor_id'], cpuInfo['family'], cpuInfo['model'])
 
 def meminfo(remoteConnection=None):

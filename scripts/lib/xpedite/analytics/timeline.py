@@ -103,6 +103,7 @@ class TimePoint(object):
     rep = 'TimePoint {0}: point {1:4,.3f} | duration {2:4,.3f}'.format(self.name, self.point, self.duration)
     if self.deltaPmcs:
       rep += ' | pmc {}'.format({self.pmcNames[i]: self.deltaPmcs[i] for i in range(len(self.deltaPmcs))})
+    rep += ' | data {0}'.format(self.data)
     return rep
 
   def __eq__(self, other):
@@ -215,6 +216,43 @@ class DeltaSeries(object):
 
   def __eq__(self, other):
     return self.numpyArray.all() == other.numpyArray.all()
+
+  def __add__(self, other):
+    if len(self.series) != len(other.series):
+      raise Exception("Can't add, different delta sample size")
+    result = DeltaSeries(self.beginProbeName, self.endProbeName)
+    for i in xrange(len(self.series)):
+      result.series.append(self.series[i] + other.series[i])
+    return result
+
+  def __sub__(self, other):
+    if len(self.series) != len(other.series):
+      raise Exception("Can't add, different delta sample size")
+    result = DeltaSeries(self.beginProbeName, self.endProbeName)
+    for i in xrange(len(self.series)):
+      result.series.append(self.series[i] - other.series[i])
+    return result
+
+  def __mul__(self, other):
+    result = DeltaSeries(self.beginProbeName, self.endProbeName)
+    if type(other) == int:
+      for i in xrange(len(self.series)):
+        result.series.append(self.series[i] * other)
+    else:
+      if len(self.series != len(other.series)):
+        raise Exception("Can't multiply, different delta sample size")
+      for i in xrange(len(self.series)):
+        result.series.append(self.series[i] * other.series[i])
+    return result
+
+  def __div__(self, other):
+    if len(self.series) != len(other.series):
+      raise Exception("Can't divide, different delta sample size")
+    result = DeltaSeries(self.beginProbeName, self.endProbeName)
+    print len(self.series)
+    for i in xrange(len(self.series)):
+      result.series.append(self.series[i] / float(other.series[i]))
+    return result
 
 class DeltaSeriesCollection(object):
   """A collection of delta series objects"""
