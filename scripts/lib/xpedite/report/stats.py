@@ -31,8 +31,7 @@ class StatsBuilder(object):
   def __init__(self):
     path = os.path.dirname(__file__)
     self.benchmarkStatsContainerFmt = loadFile(os.path.join(path, 'benchmarkStatsContainer.fmt'))
-    self.percentile1 = 95
-    self.percentile2 = 99
+    self.percentiles = [90,95,99]
 
   @staticmethod
   def buildStatsTitle(category, benchmarkNames, transactionCount):
@@ -72,8 +71,8 @@ class StatsBuilder(object):
     heading.th('Max')
     heading.th('Median')
     heading.th('Mean')
-    heading.th('{}%'.format(self.percentile1))
-    heading.th('{}%'.format(self.percentile2))
+    for percentile in self.percentiles:
+      heading.th('{}%'.format(percentile))
     heading.th('Standard Deviation')
 
   def buildTrivialStatsTable(self, deltaSeriesCollection, klass=TRIVIAL_STATS_TABLE, style=''):
@@ -100,8 +99,8 @@ class StatsBuilder(object):
       row.td(DURATION_FORMAT.format(deltaSeries.getMax()))
       row.td(DURATION_FORMAT.format(deltaSeries.getMedian()))
       row.td(DURATION_FORMAT.format(deltaSeries.getMean()))
-      row.td(DURATION_FORMAT.format(deltaSeries.getPercentile(self.percentile1)))
-      row.td(DURATION_FORMAT.format(deltaSeries.getPercentile(self.percentile2)))
+      for percentile in self.percentiles:
+        row.td(DURATION_FORMAT.format(deltaSeries.getPercentile(percentile)))
       row.td(DURATION_FORMAT.format(deltaSeries.getStandardDeviation()))
     return tableWrapper
 
@@ -140,13 +139,10 @@ class StatsBuilder(object):
       delta = deltaSeries.getMean() - refDsc[i-1].getMean()
       row.td(fmt.format(deltaSeries.getMean(), getDeltaMarkup(delta), delta), klass=getDeltaType(delta))
 
-      percentile1 = deltaSeries.getPercentile(self.percentile1)
-      delta = percentile1 - refDsc[i-1].getPercentile(self.percentile1)
-      row.td(fmt.format(percentile1, getDeltaMarkup(delta), delta), klass=getDeltaType(delta))
-
-      percentile2 = deltaSeries.getPercentile(self.percentile2)
-      delta = percentile2 - refDsc[i-1].getPercentile(self.percentile2)
-      row.td(fmt.format(percentile2, getDeltaMarkup(delta), delta), klass=getDeltaType(delta))
+      for percentile in self.percentiles:
+        p = deltaSeries.getPercentile(percentile)
+        delta = p - refDsc[i - 1].getPercentile(percentile)
+        row.td(fmt.format(p, getDeltaMarkup(delta), delta), klass=getDeltaType(delta))
 
       delta = deltaSeries.getStandardDeviation() - refDsc[i-1].getStandardDeviation()
       row.td(fmt.format(
