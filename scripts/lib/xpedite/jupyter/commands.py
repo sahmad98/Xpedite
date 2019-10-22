@@ -17,6 +17,8 @@ import logging
 from IPython.core.display      import display, HTML
 from xpedite.jupyter.context   import context
 from xpedite.report.markup     import ERROR_TEXT
+import pandas as pd
+import numpy as np
 
 LOGGER = logging.getLogger(__name__)
 
@@ -217,6 +219,17 @@ class Txns(object):
 
   def __getitem__(self, i):
     return self.profile.current.timelineCollection[i]
+
+  def get_txn_df(self):
+    pmcs = {}
+
+    delta_series_repo = self.profile.current.deltaSeriesRepo
+    for event in delta_series_repo.deltaSeriesCollectionMap:
+      series = delta_series_repo.get(event, None)[0].series
+      pmcs[event] = series
+
+    return pd.DataFrame(data=pmcs)
+
 
   def __repr__(self):
     from xpedite.util import makeUniqueId

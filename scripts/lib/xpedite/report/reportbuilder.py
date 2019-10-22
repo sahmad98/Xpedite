@@ -225,7 +225,7 @@ class ReportBuilder(object):
       row.td('{0:,}'.format(i), klass=TD_KEY)
       row.td('{:,}'.format(timeline.txnId), klass=TD_KEY)
       if logData:
-        row.td('{}'.format(timeline.data), klass=TD_KEY)
+        row.td('{0}'.format(timeline.points[0].data), klass=TD_KEY)
       row.td('{:,}'.format(timeline.inception), klass=TD_KEY)
 
       j = None

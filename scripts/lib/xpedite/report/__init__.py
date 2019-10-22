@@ -101,13 +101,15 @@ def generate(app, profiles, histograms, resultOrder, classifier, txnFilter, benc
       txnFilter, benchmarkPaths)
   categories = {name : Report.Category(name, histogram) for name, histogram in histograms.items()}
   for profile in profiles:
+    #print type(profile.current.timelineCollection)
+    #print profile.current.timelineCollection
     category = categories.get(profile.category, None)
     if category:
       begin = time.time()
       title = '{} latency statistics [{} transactions]'.format(profile.name, len(profile.current))
       LOGGER.info('generating report %s -> ', title)
       markup = ReportBuilder().buildReport(profile.current, profile.benchmarks, profile.reportProbes,
-        profile.name, resultOrder, reportThreshold)
+        profile.name, resultOrder, reportThreshold, logData=True)
       markupSize = xpedite.util.formatHumanReadable(len(markup))
       title = '{} - ({})'.format(title, markupSize)
       description = '\n\t{}\n\t'.format(title)
